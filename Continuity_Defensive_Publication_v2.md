@@ -11,7 +11,8 @@
 | **Earliest Public Release** | October 31, 2025 (Visual Studio Code Marketplace) |
 | **Supersedes** | `Continuity_Defensive_Publication_Full.pdf` (March 26, 2026) |
 | **Public timestamp venues** | (1) GitHub release tag in the public repository `Thiagoscode/continuity-defensive-publication`; (2) Technical Disclosure Commons submission at `tdcommons.org` (Elsevier-operated, indexed by USPTO and global patent offices) |
-| **Identifier** | Continuity-DP-v2-2026-05-17 |
+| **Identifier** | Continuity-DP-v2.1-2026-05-17 |
+| **Version** | 2.1 — see Corrigenda section at end for differences from v2.0 |
 
 ---
 
@@ -62,7 +63,7 @@ At a typical 200,000-token context window, overflow occurs at approximately:
 > **n ≈ 902** decisions (without base instructions subtracted)
 > **n ≈ 870** decisions (with a measured base of ~7,053 tokens subtracted)
 
-At the author's actual measured corpus of n = 2,189 decisions as of May 2026, static embedding would require approximately 485,411 tokens — more than 2.4× a typical large-context window. The conventional approach defeats itself as knowledge accumulates. This is the "Memory Wall."
+At the author's actual measured corpus of n = 2,200 decisions as of the publication date (2026-05-17), static embedding would require approximately 488,400 tokens — more than 2.4× a typical large-context window. The conventional approach defeats itself as knowledge accumulates. This is the "Memory Wall."
 
 ### II.B. The Compromised Context threat model
 
@@ -198,9 +199,9 @@ This bound is **independent of n**, the total number of stored decisions. The bo
 
 ### V.D. Measured reduction
 
-At the author's measured corpus of n = 2,189 decisions:
+At the author's measured corpus of n = 2,200 decisions (as of publication date 2026-05-17):
 
-- Static embedding would require: 2,189 × 222 = **485,898 tokens**
+- Static embedding would require: 2,200 × 222 = **488,400 tokens**
 - Bounded retrieval requires: ≤ 17,500 tokens (worst case)
 - **Reduction: ~96.4%**
 
@@ -380,7 +381,7 @@ Idempotency allows safe application of the scrub primitive at multiple boundarie
 
 ### VII.H. `_meta.credential_warnings` protocol-level signaling
 
-Detected credentials at boundaries 1 (input) or 5 (MCP tool-result) are attached to the MCP response under a `_meta.credential_warnings` field:
+Detected credentials at boundary 1 (input) are attached to the MCP response under a `_meta.credential_warnings` field:
 
 ```json
 {
@@ -388,21 +389,21 @@ Detected credentials at boundaries 1 (input) or 5 (MCP tool-result) are attached
   "_meta": {
     "credential_warnings": [
       {
-        "pattern": "github-pat-classic",
-        "confidence": "high",
-        "where": "arg:body"
+        "tool": "log_decision",
+        "argument_path": "answer",
+        "pattern": "github-pat-classic"
       },
       {
-        "pattern": "entropy-fallback",
-        "confidence": "medium",
-        "where": "result:output"
+        "tool": "log_decision",
+        "argument_path": "question",
+        "pattern": "entropy"
       }
     ]
   }
 }
 ```
 
-This surfaces detection metadata out-of-band — neither the matched secret nor a guessable prefix is included. The user-facing surface is informed; the credential itself is not re-exposed.
+Each warning identifies the tool name, the JSON path within the argument where the credential was found, and the matched pattern name. The matched secret itself is not included. Confidence level is implicit: only high-confidence (provider-pattern) matches and entropy-fallback matches are surfaced via this channel — by default only high-confidence matches trigger redaction. Output-side and tool-result scrubbing (boundary 5) redact silently without emitting this metadata; the `audit_secrets` tool is the explicit mechanism for surfacing tool-result detections to the user.
 
 ### VII.I. `audit_secrets` MCP tool
 
@@ -432,14 +433,20 @@ Two related techniques are disclosed:
 
 ### VIII.B. Multi-signal relationship inference disclosed
 
-Relationships between decision records are inferred **automatically**, without requiring manual annotations such as `[supersedes: ADR-001]`. The disclosed signal combination:
+Relationships between decision records are inferred **automatically**, without requiring manual annotations such as `[supersedes: ADR-001]`. The disclosed signal combination uses per-relation-type weights — different relation types weight the signals differently because the discriminating signal differs. Representative weights from the shipping code:
 
-| Signal | Description | Weight in composite score |
-|---|---|---|
-| Semantic similarity | Cosine similarity of the decisions' vector embeddings (computed via local MiniLM model) | 0.45 |
-| Temporal proximity | Inverse of time between decision timestamps | 0.20 |
-| Tag-set overlap | Jaccard similarity of decision tag sets | 0.25 |
-| File-affect overlap | Jaccard similarity of decision `affected_files` sets | 0.10 |
+| Relation type | Semantic | Tag overlap | File overlap | Keyword | Entity |
+|---|---|---|---|---|---|
+| `supersedes` | 0.40 | 0.30 | 0.20 | 0.10 | — |
+| `causes` / `causedBy` | 0.50 | 0.20 | 0.20 | 0.10 | — |
+| `relatedTo` | 0.30 | 0.15 | 0.25 | 0.10 | 0.20 |
+
+Signals used:
+- **Semantic similarity** — cosine similarity of the decisions' vector embeddings (computed via local MiniLM model)
+- **Tag-set overlap** — Jaccard similarity of decision tag sets
+- **File-affect overlap** — Jaccard similarity of decision `affected_files` sets
+- **Keyword overlap** — shared identifier-level tokens between question/answer texts
+- **Entity overlap** — shared named entities (file paths, identifiers, tool names) — applies to `relatedTo` only
 
 The disclosed relationship types inferred:
 
@@ -666,6 +673,37 @@ The author may be contacted at the address registered for the Visual Studio Code
 
 ---
 
-**END OF DEFENSIVE TECHNICAL DISCLOSURE — Version 2.0**
+---
+
+## CORRIGENDA — Version 2.1 (2026-05-17, same day as v2.0)
+
+This v2.1 revision corrects precision details against the shipping source code without altering the substantive disclosure. v2.0 was published earlier on 2026-05-17 (commit `6193a88`, tag `defensive-pub-v2.0-2026-05-17`) and remains the original timestamp anchor for the disclosed methods. v2.1 supersedes v2.0 only for the specific precision corrections below; the disclosure of methods, threat model, prior-art acknowledgments, and combinations is unchanged.
+
+**Corrections in v2.1:**
+
+1. **Decision corpus snapshot updated** from `n = 2,189` (May 2026 reference snapshot) to `n = 2,200` (publication date 2026-05-17). Static-embedding token figure correspondingly updated: 488,400 tokens at n=2,200 vs 485,898 tokens at n=2,189. Reduction percentage unchanged at ~96.4% to two significant figures.
+
+2. **`_meta.credential_warnings` JSON example corrected.** v2.0 showed `{pattern, confidence, where}`; the actual shipping shape is `{tool, argument_path, pattern}`. v2.0 also showed the entropy fallback as pattern name `"entropy-fallback"`; the shipping name is `"entropy"`. Section VII.H rewritten with the correct shape.
+
+3. **Multi-signal relationship weights corrected** from a flat four-signal weighting (0.45/0.20/0.25/0.10) to the shipping per-relation-type weights. The conceptual disclosure — multi-signal weighted scoring inferring relationships automatically — is unchanged.
+
+4. **Boundary-5 (tool-result) emission clarified.** v2.0 stated that detections at boundary 1 OR boundary 5 emit `_meta.credential_warnings`. In actual shipping code, only boundary 1 (InputScrubber) emits the metadata channel; boundary 5 (ToolResultScrubber) redacts silently. The `audit_secrets` tool is the explicit user-facing surface for boundary-5 detections.
+
+5. **MCP service / module counts corrected.** Where v2.0 implicitly referenced "18 MCP-server services" and "15 tool modules," the verified counts are 17 MCP-server services and 13 tool module directories (69 MCP tools is unchanged). Numbers were not load-bearing in v2.0 prose but are corrected in supplementary internal documentation.
+
+**Not changed from v2.0:**
+
+- The five disclosed methods (A bounded retrieval, B governance lock, C 5-boundary scrubbing, D multi-signal inference + Markov, E Memory Amplifier threat)
+- The 27 provider patterns in Section VII.C
+- The Shannon-entropy threshold of 4.5 bits/character with calibration sweep evidence
+- The chronology in Section X
+- All prior-art acknowledgments in Section II.D and Section XV
+- All disclosure boundaries in Section XII
+
+The original v2.0 disclosure remains the prior-art anchor for the substantive methods. v2.1 is a precision revision.
+
+---
+
+**END OF DEFENSIVE TECHNICAL DISCLOSURE — Version 2.1**
 
 Document SHA-256 of this file (computed at time of GitHub commit) will appear in the corresponding release tag.
