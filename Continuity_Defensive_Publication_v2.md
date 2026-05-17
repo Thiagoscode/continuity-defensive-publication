@@ -1,6 +1,6 @@
 # CONTINUITY: PERSISTENT DECISION-CENTRIC AI COGNITION WITH RUNTIME GOVERNANCE, BOUNDED RETRIEVAL, AND DEFENSE-IN-DEPTH CREDENTIAL SCRUBBING
 
-## DEFENSIVE TECHNICAL DISCLOSURE — Version 2.1
+## DEFENSIVE TECHNICAL DISCLOSURE — Version 2.0
 
 | Field | Value |
 |---|---|
@@ -11,8 +11,7 @@
 | **Earliest Public Release** | October 31, 2025 (Visual Studio Code Marketplace) |
 | **Supersedes** | `Continuity_Defensive_Publication_Full.pdf` (March 26, 2026) |
 | **Public timestamp venues** | (1) GitHub release tag in the public repository `Thiagoscode/continuity-defensive-publication`; (2) Technical Disclosure Commons submission at `tdcommons.org` (Elsevier-operated, indexed by USPTO and global patent offices) |
-| **Identifier** | Continuity-DP-v2.1-2026-05-17 |
-| **Version** | 2.1 — see Corrigenda section at end for differences from v2.0 |
+| **Identifier** | Continuity-DP-v2.0-2026-05-17 |
 
 ---
 
@@ -675,35 +674,6 @@ The author may be contacted at the address registered for the Visual Studio Code
 
 ---
 
-## CORRIGENDA — Version 2.1 (2026-05-17, same day as v2.0)
-
-This v2.1 revision corrects precision details against the shipping source code without altering the substantive disclosure. v2.0 was published earlier on 2026-05-17 (commit `6193a88`, tag `defensive-pub-v2.0-2026-05-17`) and remains the original timestamp anchor for the disclosed methods. v2.1 supersedes v2.0 only for the specific precision corrections below; the disclosure of methods, threat model, prior-art acknowledgments, and combinations is unchanged.
-
-**Corrections in v2.1:**
-
-1. **Decision corpus snapshot updated** from `n = 2,189` (May 2026 reference snapshot) to `n = 2,200` (publication date 2026-05-17). Static-embedding token figure correspondingly updated: 488,400 tokens at n=2,200 vs 485,898 tokens at n=2,189. Reduction percentage unchanged at ~96.4% to two significant figures.
-
-2. **`_meta.credential_warnings` JSON example corrected.** v2.0 showed `{pattern, confidence, where}`; the actual shipping shape is `{tool, argument_path, pattern}`. v2.0 also showed the entropy fallback as pattern name `"entropy-fallback"`; the shipping name is `"entropy"`. Section VII.H rewritten with the correct shape.
-
-3. **Multi-signal relationship weights corrected** from a flat four-signal weighting (0.45/0.20/0.25/0.10) to the shipping per-relation-type weights. The conceptual disclosure — multi-signal weighted scoring inferring relationships automatically — is unchanged.
-
-4. **Boundary-5 (tool-result) emission clarified.** v2.0 stated that detections at boundary 1 OR boundary 5 emit `_meta.credential_warnings`. In actual shipping code, only boundary 1 (InputScrubber) emits the metadata channel; boundary 5 (ToolResultScrubber) redacts silently. The `audit_secrets` tool is the explicit user-facing surface for boundary-5 detections.
-
-5. **MCP service / module counts corrected.** Where v2.0 implicitly referenced "18 MCP-server services" and "15 tool modules," the verified counts are 17 MCP-server services and 13 tool module directories (69 MCP tools is unchanged). Numbers were not load-bearing in v2.0 prose but are corrected in supplementary internal documentation.
-
-**Not changed from v2.0:**
-
-- The five disclosed methods (A bounded retrieval, B governance lock, C 5-boundary scrubbing, D multi-signal inference + Markov, E Memory Amplifier threat)
-- The 27 provider patterns in Section VII.C
-- The Shannon-entropy threshold of 4.5 bits/character with calibration sweep evidence
-- The chronology in Section X
-- All prior-art acknowledgments in Section II.D and Section XV
-- All disclosure boundaries in Section XII
-
-The original v2.0 disclosure remains the prior-art anchor for the substantive methods. v2.1 is a precision revision.
-
----
-
-**END OF DEFENSIVE TECHNICAL DISCLOSURE — Version 2.1**
+**END OF DEFENSIVE TECHNICAL DISCLOSURE — Version 2.0**
 
 Document SHA-256 of this file (computed at time of GitHub commit) will appear in the corresponding release tag.
