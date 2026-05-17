@@ -10,7 +10,7 @@
 | **Earliest Engineering Commit** | October 3, 2025 |
 | **Earliest Public Release** | October 31, 2025 (Visual Studio Code Marketplace) |
 | **Supersedes** | `Continuity_Defensive_Publication_Full.pdf` (March 26, 2026) |
-| **Public timestamp venues** | (1) GitHub release tag in a public repository under `Thiagoscode/continuity`; (2) defensivepublications.org submission via the Linux Defenders network |
+| **Public timestamp venues** | (1) GitHub release tag in the public repository `Thiagoscode/continuity-defensive-publication`; (2) Technical Disclosure Commons submission at `tdcommons.org` (Elsevier-operated, indexed by USPTO and global patent offices) |
 | **Identifier** | Continuity-DP-v2-2026-05-17 |
 
 ---
